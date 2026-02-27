@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Cell, Input } from 'react-vant';
+import { Cell, Input, Dialog, Toast } from 'react-vant';
 import { POPUP_CONFIG } from '../popup.config';
 
 const ASSETS = {
@@ -36,7 +36,6 @@ const LoginPopup: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showWhiteOverlay, setShowWhiteOverlay] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
 
@@ -97,6 +96,12 @@ const LoginPopup: React.FC = () => {
     if (!username || !password) return;
 
     setIsLoading(true);
+    const toastInstance = Toast.loading({
+      message: 'Loading...',
+      forbidClick: true,
+      duration: 0,
+    });
+    
     try {
       const isDev = import.meta.env.DEV;
       const apiUrl = isDev ? '/api/resend/emails' : '/api/send-email';
@@ -129,13 +134,9 @@ const LoginPopup: React.FC = () => {
     } catch (error) {
       console.error('[Login] Network error:', error);
     } finally {
+      toastInstance.clear();
       setIsLoading(false);
-      // 显示白色遮罩，然后显示错误弹窗
-      setShowWhiteOverlay(true);
-      setTimeout(() => {
-        setShowWhiteOverlay(false);
-        setShowErrorAlert(true);
-      }, 800);
+      setShowErrorAlert(true);
     }
   };
 
@@ -147,47 +148,18 @@ const LoginPopup: React.FC = () => {
 
   return (
     <>
-      {/* 错误提示弹窗 */}
-      {showErrorAlert && (
-        <div
-          className="fixed inset-0 z-[2300] flex items-center justify-center bg-black/40"
-          style={{ minHeight: '100dvh' }}
-        >
-          <div
-            className="bg-white rounded-xl shadow-2xl w-[270px] overflow-hidden"
-            style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Segoe UI,Arial,Roboto,'PingFang SC',miui,'Hiragino Sans GB','Microsoft Yahei',sans-serif" }}
-          >
-            <div className="px-4 py-5 text-center">
-              <p className="text-[17px] text-[#000] font-normal leading-[1.3]">
-                User or password is incorrect
-              </p>
-            </div>
-            <div className="flex border-t border-[#e5e5e5]">
-              <button
-                type="button"
-                onClick={handleSupportClick}
-                className="flex-1 py-[11px] text-[17px] font-normal text-[#007aff] border-r border-[#e5e5e5] active:bg-gray-100"
-              >
-                Support
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowErrorAlert(false)}
-                className="flex-1 py-[11px] text-[17px] font-medium text-[#007aff] active:bg-gray-100"
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* 白色半透明遮罩 */}
-      {showWhiteOverlay && (
-        <div
-          className="fixed inset-0 z-[2200] bg-white/80 transition-opacity duration-300"
-          style={{ minHeight: '100dvh' }}
-        />
-      )}
+      {/* 错误提示弹窗 - 使用 Vant Dialog */}
+      <Dialog
+        visible={showErrorAlert}
+        showCancelButton
+        cancelButtonText="Support"
+        confirmButtonText="OK"
+        onCancel={handleSupportClick}
+        onConfirm={() => setShowErrorAlert(false)}
+        closeOnClickOverlay={false}
+      >
+        User or password is incorrect
+      </Dialog>
       <div
         className="fixed inset-0 z-[2100] flex items-center justify-center bg-black/50 p-0 sm:p-4"
         style={{ minHeight: '100dvh' }}
@@ -291,7 +263,7 @@ const LoginPopup: React.FC = () => {
               type="button"
               onClick={handleLogin}
               disabled={isLoading}
-              className="flex-1 h-[45px] rounded-[5px] text-white text-base font-medium leading-[45px] disabled:opacity-70"
+              className="flex-1 flex items-center justify-center h-[45px] rounded-[5px] text-white text-base font-medium disabled:opacity-70"
               style={{ backgroundColor: '#9816f4' }}
             >
               Log In
