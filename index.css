@@ -124,3 +124,43 @@ body {
   }
 }
 
+/* Dialog 样式优化 */
+.rv-dialog {
+  border-radius: 5px !important;
+  width: 280px !important;
+  overflow: hidden;
+}
+
+.rv-dialog__content {
+  padding: 24px 20px !important;
+  text-align: center;
+  font-size: 16px;
+  color: #323233;
+  line-height: 1.5;
+}
+
+.rv-dialog__footer {
+  display: flex;
+  border-top: 1px solid #ebedf0;
+}
+
+.rv-dialog__footer .rv-button {
+  flex: 1;
+  height: 48px;
+  font-size: 16px;
+  border: none;
+  border-radius: 0 !important;
+}
+
+.rv-dialog__footer .rv-button--default {
+  color: #1989fa;
+  background: #fff;
+  border-right: 1px solid #ebedf0;
+}
+
+.rv-dialog__footer .rv-button--danger {
+  color: #1989fa;
+  background: #fff;
+  font-weight: 500;
+}
+
