@@ -1,0 +1,10 @@
+
+{
+  "name": "Agent4U Pro Workspace",
+  "description": "A high-performance workspace designed for seamless integration with the Agent4U platform, featuring AI-powered insights and responsive device simulation.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}

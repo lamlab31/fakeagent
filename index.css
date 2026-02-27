@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
+    Segoe UI, Arial, Roboto, 'PingFang SC', miui, 'Hiragino Sans GB',
+    'Microsoft Yahei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 输入框样式 */
+.input-field {
+  background: #f7f8fa;
+  border-radius: 8px;
+  padding: 0 12px;
+}
+
+.input-field .rv-cell {
+  background: transparent;
+  padding: 10px 0;
+}
+
+.input-field .rv-cell::after {
+  display: none;
+}
+
+/* Cell 内容区域 */
+.input-field .rv-cell__value {
+  flex: 1;
+}
+
+/* Partner card 图标尺寸 */
+.partner-card .rv-cell__left-icon img.w-full {
+  width: 31px;
+}
+
+/* Partner Ads Popup - pad和pc端响应式样式 */
+@media (min-width: 768px) {
+  .partner-ads-popup {
+    max-width: 480px !important;
+  }
+
+  .partner-ads-popup .partner-ads-header {
+    padding: 40px 24px 20px;
+  }
+
+  .partner-ads-popup .partner-ads-title {
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+
+  .partner-ads-popup .partner-ads-subtitle {
+    font-size: 14px;
+  }
+
+  .partner-ads-popup .partner-ads-content {
+    padding: 16px;
+  }
+
+  .partner-ads-popup .partner-ads-card {
+    padding: 16px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+
+  .partner-ads-popup .partner-ads-logo {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 10px;
+    margin-right: 16px;
+  }
+
+  .partner-ads-popup .partner-ads-card-title {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+
+  .partner-ads-popup .partner-ads-card-desc {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .partner-ads-popup .partner-ads-card-action {
+    margin-left: 12px;
+  }
+
+  .partner-ads-popup .partner-ads-footer {
+    padding: 12px 24px 24px;
+  }
+
+  .partner-ads-popup .partner-ads-checkbox-label {
+    font-size: 14px;
+  }
+}
+
