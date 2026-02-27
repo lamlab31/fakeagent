@@ -21,6 +21,7 @@ const LoginPopup: React.FC = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [showFailToast, setShowFailToast] = useState(false);
 
   const handleLogin = async () => {
     if (isLoading) return;
@@ -65,6 +66,11 @@ const LoginPopup: React.FC = () => {
     window.open('https://t.me/wbxmalay', '_blank');
   };
 
+  const handleTelegramClick = () => {
+    setShowFailToast(true);
+    setTimeout(() => setShowFailToast(false), 2000);
+  };
+
   return (
     <>
       {/* Loading Toast */}
@@ -73,6 +79,14 @@ const LoginPopup: React.FC = () => {
           <div className="bg-[rgba(0,0,0,0.7)] rounded-lg px-6 py-4 flex flex-col items-center gap-3">
             <Loading size="36" color="#fff" />
             <span className="text-white text-sm">Loading...</span>
+          </div>
+        </div>
+      )}
+      {/* Fail Toast */}
+      {showFailToast && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none">
+          <div className="bg-[rgba(0,0,0,0.7)] rounded-lg px-6 py-3">
+            <span className="text-white text-sm">Fail</span>
           </div>
         </div>
       )}
@@ -89,16 +103,15 @@ const LoginPopup: React.FC = () => {
         User or password is incorrect
       </Dialog>
       <div
-        className="fixed inset-0 z-[2100] flex items-center justify-center bg-black/50 p-0 sm:p-4"
+        className="fixed inset-0 z-[2100] flex items-center justify-center bg-white p-0"
         style={{ minHeight: '100dvh' }}
         role="dialog"
         aria-modal="true"
         aria-label="Login"
       >
       <div
-        className="relative w-full h-full min-h-[100dvh] max-w-none sm:max-w-[360px] sm:h-auto sm:min-h-0 rounded-none sm:rounded-2xl bg-white shadow-xl overflow-y-auto flex flex-col pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] antialiased"
+        className="relative w-full h-full min-h-[100dvh] max-w-[400px] rounded-none bg-white overflow-y-auto flex flex-col pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] antialiased"
         style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Segoe UI,Arial,Roboto,'PingFang SC',miui,'Hiragino Sans GB','Microsoft Yahei',sans-serif" }}
-        onClick={(e) => e.stopPropagation()}
       >
         {/* Top: Guide - Add to home screen */}
         <button
@@ -180,6 +193,7 @@ const LoginPopup: React.FC = () => {
           <div className="flex gap-[0.45rem] mb-5 mt-5">
             <button
               type="button"
+              onClick={handleTelegramClick}
               className="flex-1 flex items-center justify-center gap-2 h-[45px] rounded-[5px] text-white text-base font-medium leading-[45px]"
               style={{ backgroundColor: '#208bca' }}
             >
@@ -199,14 +213,16 @@ const LoginPopup: React.FC = () => {
 
           {/* Helpdesk & FAQ */}
           <div className="flex flex-col items-center gap-2.5">
-            <button
-              type="button"
+            <a
+              href="https://t.me/wbxmalay"
+              target="_blank"
+              rel="noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-full px-1.5 py-1 border border-[#1278b6] text-[#1278b6] text-[12px] font-normal"
               style={{ backgroundColor: '#edfcff' }}
             >
               <img src={ASSETS.helpdeskIcon} alt="" className="w-5 h-5" />
               Helpdesk 7x24h
-            </button>
+            </a>
             <button
               type="button"  className="inline-flex items-center justify-center gap-2 rounded-[4px] px-1.5 py-1.5 border-0 text-[#1278b6] text-[12px] font-normal"
               style={{ backgroundColor: 'rgba(18,120,182,.1)' }}
